@@ -2,7 +2,7 @@ import React from "react";
 import { View } from "react-native";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function ProductSkeleton() {
+export function ProductCardSkeleton() {
   return (
     <View className="w-1/2 p-2">
       <View className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">

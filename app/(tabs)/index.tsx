@@ -1,19 +1,19 @@
-import React, { useEffect, useCallback } from "react";
-import { FlatList, Text, View } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
-import { useSharedValue } from "react-native-reanimated";
-import {
-  useProducts,
-  useFetchProducts,
-  useIsLoading,
-  useFetchAllBrands,
-} from "@/store/useArtShopStore";
-import { Product } from "@/types";
-import { ProductSkeleton } from "@/components/ProductSkeleton";
-import { ProductCard } from "@/components/ProductCard";
 import { AnimatedHeader } from "@/components/AnimatedHeader";
 import { Header } from "@/components/Header";
+import { ProductCard } from "@/components/ProductCard";
+import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import {
+  useFetchAllBrands,
+  useFetchProducts,
+  useIsLoading,
+  useProducts,
+} from "@/store/useArtShopStore";
+import { Product } from "@/types";
+import React, { useCallback, useEffect } from "react";
+import { FlatList, Text, View } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
 
 export default function HomeScreen() {
   const products = useProducts();
@@ -32,11 +32,11 @@ export default function HomeScreen() {
   useEffect(() => {
     fetchProducts();
     fetchAllBrands();
-  }, [fetchProducts, fetchAllBrands]);
+  }, []);
 
   const renderItem = ({ item, index }: { item: Product; index: number }) =>
     isLoading ? (
-      <ProductSkeleton key={`skeleton-${index}`} />
+      <ProductCardSkeleton key={`skeleton-${index}`} />
     ) : (
       <ProductCard product={item} />
     );

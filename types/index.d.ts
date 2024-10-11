@@ -21,3 +21,8 @@ export type Product = {
   limitedTimeDeal: number;
   comments: Comment[];
 };
+
+export type RatingGoup = {
+  rating: number;
+  count: number;
+};
