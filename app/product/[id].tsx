@@ -1,11 +1,9 @@
-import React, { useEffect, useState, useTransition } from "react";
-import { View, Image, ScrollView, Pressable } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { ThemedView } from "@/components/ThemedView";
-import { ThemedText } from "@/components/ThemedText";
 import { ProductApi } from "@/api/product";
-import { Product, RatingGoup } from "@/types";
+import ProductComments from "@/components/ProductComments";
 import ProductDetailSkeleton from "@/components/ProductDetailSkeleton";
+import RatingAnalyst from "@/components/RatingAnalyst";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
 import {
   formatDiscount,
   getAverageRating,
@@ -13,9 +11,11 @@ import {
   handlGroupRating,
   USD,
 } from "@/lib/format";
-import { ArrowLeft, Star } from "lucide-react-native";
-import ProductComments from "@/components/ProductComments";
-import RatingAnalyst from "@/components/RatingAnalyst";
+import { Product, RatingGoup } from "@/types";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState, useTransition } from "react";
+import { Image, Pressable, ScrollView, View } from "react-native";
+import { Rating } from "react-native-ratings";
 
 export default function ProductScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -71,7 +71,7 @@ export default function ProductScreen() {
   }
 
   return (
-    <ThemedView className="flex-1 bg-gray-50 dark:bg-gray-900">
+    <ThemedView className="flex-1 bg-white dark:bg-gray-900">
       <ScrollView className="flex-1">
         <View className="relative">
           <Image
@@ -79,7 +79,7 @@ export default function ProductScreen() {
             className="w-full h-96 object-cover"
           />
         </View>
-        <View className="p-6 -mt-6 rounded-t-3xl bg-gray-100 dark:bg-gray-800">
+        <View className="p-6 -mt-6 rounded-t-3xl bg-white dark:bg-gray-800">
           <ThemedText className="text-3xl font-bold mb-2 ">
             {currentProduct.artName}
           </ThemedText>
@@ -132,10 +132,19 @@ export default function ProductScreen() {
                 <ThemedText className="text-xl font-semibold mb-3">
                   Reviews
                 </ThemedText>
-                <View className="flex-row items-center">
-                  <Star size={20} color="#FFD700" fill="#FFD700" />
-                  <ThemedText className="ml-1 text-lg font-semibold">
-                    4.5
+                <View className="flex-row justify-between items-center py-3 border-y border-gray-200 mb-2">
+                  <View className="flex-row items-center gap-4  ">
+                    <Rating
+                      ratingCount={5}
+                      imageSize={20}
+                      startingValue={getAverageRating(currentProduct)}
+                    />
+                    <ThemedText>
+                      {getAverageRating(currentProduct).toFixed(1)}
+                    </ThemedText>
+                  </View>
+                  <ThemedText className="text-sm ">
+                    {currentProduct.comments.length} review(s)
                   </ThemedText>
                 </View>
                 <RatingAnalyst
