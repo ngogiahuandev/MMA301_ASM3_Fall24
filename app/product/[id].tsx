@@ -2,6 +2,7 @@ import { ProductApi } from "@/api/product";
 import ProductComments from "@/components/ProductComments";
 import ProductDetailSkeleton from "@/components/ProductDetailSkeleton";
 import RatingAnalyst from "@/components/RatingAnalyst";
+import RelatedProducts from "@/components/RelatedProduct";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import {
@@ -161,6 +162,10 @@ export default function ProductScreen() {
               </ThemedText>
             )}
           </View>
+          <RelatedProducts
+            brand={currentProduct.brand}
+            currentProductId={currentProduct.id}
+          />
         </View>
       </ScrollView>
       {/* <View className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">

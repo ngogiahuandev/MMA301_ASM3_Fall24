@@ -21,7 +21,7 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <Pressable className="w-1/2 p-2 " onPress={handlePress}>
+    <Pressable className="w-52 p-2 " onPress={handlePress}>
       {({ pressed }) => (
         <View
           className={`bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden ${
