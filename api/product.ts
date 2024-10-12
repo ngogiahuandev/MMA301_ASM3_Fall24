@@ -9,16 +9,16 @@ export namespace ProductApi {
       });
       return response.data;
     } catch (error) {
-      throw new Error(`Failed to fetch products: ${error}`);
+      return [];
     }
   }
 
-  export async function getById(id: string): Promise<Product> {
+  export async function getById(id: string): Promise<Product | null> {
     try {
       const response = await axiosInstance.get<Product>(`/products/${id}`);
       return response.data;
     } catch (error) {
-      throw new Error(`Failed to fetch product with ID ${id}: ${error}`);
+      return null;
     }
   }
 }

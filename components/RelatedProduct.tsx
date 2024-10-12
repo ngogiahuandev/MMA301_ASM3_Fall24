@@ -54,7 +54,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({
   }
 
   return (
-    <ThemedView className="mb-6">
+    <ThemedView className="my-6">
       <ThemedText className="text-xl font-semibold mb-4">
         Related Products
       </ThemedText>

@@ -11,6 +11,7 @@ import {
   useProducts,
 } from "@/store/useArtShopStore";
 import { Product } from "@/types";
+import { Brackets } from "lucide-react-native";
 import React, { useCallback, useEffect } from "react";
 import { FlatList, Text, View } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
@@ -51,7 +52,6 @@ export default function HomeScreen() {
           isLoading ? `skeleton-${index}` : item.id
         }
         numColumns={2}
-        columnWrapperStyle={{ justifyContent: "flex-start" }}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={<Header />}
         ListEmptyComponent={
@@ -60,8 +60,11 @@ export default function HomeScreen() {
               No products found. Try adjusting your search or filters.
             </ThemedText>
           ) : (
-            <View>
-              <Text>There are no products</Text>
+            <View className="w-full aspect-video flex items-center justify-center rounded-md">
+              <View className="flex flex-col items-center justify-center">
+                <Brackets size={64} className="text-gray-400 " />
+                <Text className="text-gray-400 ">There are no products</Text>
+              </View>
             </View>
           )
         }

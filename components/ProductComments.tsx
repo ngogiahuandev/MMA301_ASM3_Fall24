@@ -66,10 +66,10 @@ const ProductComments = ({ comments }: CommentProps) => {
         <View className="h-full">
           <Image
             source={{ uri: comment.user.image }}
-            className="w-12 h-12 rounded-full bg-gray-200 mt-3"
+            className="w-12 h-12 rounded-full  mt-3"
           />
         </View>
-        <View className="flex-1 p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-md">
+        <View className="flex-1 p-4 bg-white  dark:bg-gray-800 rounded-xl shadow-black shadow-md border border-gray-200">
           <View className="flex-row items-center justify-between mb-2">
             <ThemedText className="font-semibold text-lg">
               {comment.user.name}

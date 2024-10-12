@@ -1,8 +1,10 @@
 import { ThemedText } from "@/components/ThemedText";
+import { FavList } from "@/lib/favList";
 import { getAverageRating } from "@/lib/format";
 import { Product } from "@/types";
 import { useRouter } from "expo-router";
-import React from "react";
+import { Heart } from "lucide-react-native";
+import React, { useEffect, useMemo } from "react";
 import { Image, Pressable, View } from "react-native";
 import { Rating } from "react-native-ratings";
 
@@ -12,6 +14,12 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const router = useRouter();
+  const [isFavorite, setIsFavorite] = React.useState<boolean>(false);
+  const [flag, setFlag] = React.useState<boolean>(false);
+
+  useEffect(() => {
+    FavList.check(product).then((result) => setIsFavorite(result));
+  }, [product, flag]);
 
   const handlePress = () => {
     router.push({
@@ -28,10 +36,25 @@ export function ProductCard({ product }: ProductCardProps) {
             pressed ? "opacity-75" : ""
           }`}
         >
-          <Image
-            source={{ uri: product.image }}
-            className="w-full h-40 object-cover"
-          />
+          <View className="relative">
+            <Image
+              source={{ uri: product.image }}
+              className="w-full h-40 object-cover"
+            />
+            <Pressable
+              onPress={() => {
+                FavList.toggle(product).finally(() => setFlag(!flag));
+              }}
+              className="absolute top-2 right-2 active:opacity-70 "
+            >
+              <Heart
+                size={24}
+                className="border"
+                color={"#ef4444"}
+                fill={isFavorite ? "#ef4444" : "none"}
+              />
+            </Pressable>
+          </View>
           <View className="p-4 space-y-2">
             <ThemedText
               type="subtitle"

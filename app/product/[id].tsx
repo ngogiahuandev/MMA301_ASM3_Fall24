@@ -32,7 +32,7 @@ export default function ProductScreen() {
         .then((product) => {
           setCurrentProduct(product);
           setError(null);
-          setRatingGrup(handlGroupRating(product));
+          setRatingGrup(handlGroupRating(product!));
         })
         .catch((error) => {
           console.error("Failed to fetch product:", error);
@@ -118,8 +118,18 @@ export default function ProductScreen() {
             <ThemedText className="text-xl font-semibold mb-3">
               Features
             </ThemedText>
-            <View className="bg-blue-100 dark:bg-gray-700 p-4 rounded-xl">
-              <ThemedText className="text-base">
+            <View
+              className={`dark:bg-gray-700 p-4 rounded-xl ${
+                currentProduct.glassSurface ? "bg-green-100 " : "bg-red-100 "
+              }`}
+            >
+              <ThemedText
+                className={`text-base text-center ${
+                  currentProduct.glassSurface
+                    ? "text-green-800"
+                    : "text-red-800"
+                }`}
+              >
                 {currentProduct.glassSurface
                   ? "Glass surface is available"
                   : "Non-glass surface"}
@@ -157,9 +167,11 @@ export default function ProductScreen() {
                 </View>
               </View>
             ) : (
-              <ThemedText className="text-lg font-semibold mt-4">
-                No reviews yet
-              </ThemedText>
+              <View className="bg-gray-200 aspect-video w-full rounded-md justify-center items-center flex ">
+                <ThemedText className="text-gray-500">
+                  No reviews yet
+                </ThemedText>
+              </View>
             )}
           </View>
           <RelatedProducts
