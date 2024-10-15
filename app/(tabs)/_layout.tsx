@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
+import { HeartIcon, HomeIcon } from "lucide-react-native";
 
 export default function TabLayout() {
   return (
@@ -16,9 +17,10 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "home" : "home-outline"}
-              color={color}
+            <HomeIcon
+              size={24}
+              className={`${focused ? "text-blue-500" : "text-gray-500"}`}
+              fill={focused ? "#3b82f6" : "none"}
             />
           ),
           headerShown: false,
@@ -30,9 +32,10 @@ export default function TabLayout() {
         options={{
           title: "Favorites",
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? "heart" : "heart-outline"}
-              color={color}
+            <HeartIcon
+              size={24}
+              className={`${focused ? "text-red-500" : "text-gray-500"}`}
+              fill={focused ? "#ef4444" : "none"}
             />
           ),
           tabBarShowLabel: false,

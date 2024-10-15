@@ -1,6 +1,7 @@
 import { ThemedText } from "@/components/ThemedText";
 import { FavList } from "@/lib/favList";
 import { getAverageRating } from "@/lib/format";
+import { useTrigger } from "@/store/useTrigger";
 import { Product } from "@/types";
 import { useRouter } from "expo-router";
 import { Heart } from "lucide-react-native";
@@ -13,13 +14,13 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { trigger, switchTrigger } = useTrigger();
   const router = useRouter();
   const [isFavorite, setIsFavorite] = React.useState<boolean>(false);
-  const [flag, setFlag] = React.useState<boolean>(false);
 
   useEffect(() => {
     FavList.check(product).then((result) => setIsFavorite(result));
-  }, [product, flag]);
+  }, [product, trigger]);
 
   const handlePress = () => {
     router.push({
@@ -43,7 +44,7 @@ export function ProductCard({ product }: ProductCardProps) {
             />
             <Pressable
               onPress={() => {
-                FavList.toggle(product).finally(() => setFlag(!flag));
+                FavList.toggle(product).finally(switchTrigger);
               }}
               className="absolute top-2 right-2 active:opacity-70 "
             >

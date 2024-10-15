@@ -1,10 +1,12 @@
 import { ProductApi } from "@/api/product";
 import ProductComments from "@/components/ProductComments";
 import ProductDetailSkeleton from "@/components/ProductDetailSkeleton";
+import ProductNavigation from "@/components/ProductNavigation";
 import RatingAnalyst from "@/components/RatingAnalyst";
 import RelatedProducts from "@/components/RelatedProduct";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
+import { FavList } from "@/lib/favList";
 import {
   formatDiscount,
   getAverageRating,
@@ -12,8 +14,10 @@ import {
   handlGroupRating,
   USD,
 } from "@/lib/format";
+import { useTrigger } from "@/store/useTrigger";
 import { Product, RatingGoup } from "@/types";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { Heart } from "lucide-react-native";
 import React, { useEffect, useState, useTransition } from "react";
 import { Image, Pressable, ScrollView, View } from "react-native";
 import { Rating } from "react-native-ratings";
@@ -25,6 +29,14 @@ export default function ProductScreen() {
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ratingGrup, setRatingGrup] = useState<RatingGoup[]>([]);
+  const { trigger, switchTrigger } = useTrigger();
+  const [isFavorite, setIsFavorite] = React.useState<boolean>(false);
+
+  useEffect(() => {
+    if (currentProduct) {
+      FavList.check(currentProduct).then((result) => setIsFavorite(result));
+    }
+  }, [currentProduct, trigger]);
 
   const fetchProductById = (id: string) => {
     startTransition(() => {
@@ -81,9 +93,24 @@ export default function ProductScreen() {
           />
         </View>
         <View className="p-6 -mt-6 rounded-t-3xl bg-white dark:bg-gray-800">
-          <ThemedText className="text-3xl font-bold mb-2 ">
-            {currentProduct.artName}
-          </ThemedText>
+          <View className="flex flex-row items-center gap-4 ">
+            <ThemedText className="text-3xl font-bold mb-2 flex-1">
+              {currentProduct.artName}
+            </ThemedText>
+            <Pressable
+              onPress={() => {
+                FavList.toggle(currentProduct).finally(switchTrigger);
+              }}
+              className=" active:opacity-70 "
+            >
+              <Heart
+                size={24}
+                className="border"
+                color={"#ef4444"}
+                fill={isFavorite ? "#ef4444" : "none"}
+              />
+            </Pressable>
+          </View>
           <ThemedText className="text-lg text-gray-600 dark:text-gray-400 mb-4">
             {currentProduct.brand}
           </ThemedText>
@@ -187,6 +214,7 @@ export default function ProductScreen() {
           </ThemedText>
         </Pressable>
       </View> */}
+      <ProductNavigation />
     </ThemedView>
   );
 }

@@ -13,7 +13,14 @@ import {
 import { Product } from "@/types";
 import { Brackets } from "lucide-react-native";
 import React, { useCallback, useEffect } from "react";
-import { FlatList, Text, View } from "react-native";
+import {
+  FlatList,
+  Platform,
+  SafeAreaView,
+  StatusBar,
+  Text,
+  View,
+} from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 
 export default function HomeScreen() {
@@ -45,35 +52,42 @@ export default function HomeScreen() {
     );
 
   return (
-    <ThemedView className="flex-1 bg-white">
-      <AnimatedHeader scrollY={scrollY} />
-      <FlatList
-        data={isLoading ? Array(6).fill({}) : products}
-        renderItem={renderItem}
-        keyExtractor={(item, index) =>
-          isLoading ? `skeleton-${index}` : item.id
-        }
-        numColumns={2}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={<Header />}
-        ListEmptyComponent={
-          isLoading ? (
-            <ThemedText className="text-center mt-4">
-              No products found. Try adjusting your search or filters.
-            </ThemedText>
-          ) : (
-            <View className="w-full aspect-video flex items-center justify-center rounded-md">
-              <View className="flex flex-col items-center justify-center">
-                <Brackets size={64} className="text-gray-400 " />
-                <Text className="text-gray-400 ">There are no products</Text>
+    <SafeAreaView
+      className="flex-1 bg-gray-50 dark:bg-gray-900"
+      style={{
+        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+      }}
+    >
+      <ThemedView className="flex-1 bg-white">
+        <AnimatedHeader scrollY={scrollY} />
+        <FlatList
+          data={isLoading ? Array(6).fill({}) : products}
+          renderItem={renderItem}
+          keyExtractor={(item, index) =>
+            isLoading ? `skeleton-${index}` : item.id
+          }
+          numColumns={2}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={<Header />}
+          ListEmptyComponent={
+            isLoading ? (
+              <ThemedText className="text-center mt-4">
+                No products found. Try adjusting your search or filters.
+              </ThemedText>
+            ) : (
+              <View className="w-full aspect-video flex items-center justify-center rounded-md">
+                <View className="flex flex-col items-center justify-center">
+                  <Brackets size={64} className="text-gray-400 " />
+                  <Text className="text-gray-400 ">There are no products</Text>
+                </View>
               </View>
-            </View>
-          )
-        }
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        contentContainerStyle={{ paddingHorizontal: 16 }}
-      />
-    </ThemedView>
+            )
+          }
+          onScroll={handleScroll}
+          scrollEventThrottle={16}
+          contentContainerStyle={{ paddingHorizontal: 16 }}
+        />
+      </ThemedView>
+    </SafeAreaView>
   );
 }
