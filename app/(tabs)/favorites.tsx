@@ -1,102 +1,253 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform } from 'react-native';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  SafeAreaView,
+  Platform,
+  StatusBar,
+  Alert,
+  Button,
+  Pressable,
+} from "react-native";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedView } from "@/components/ThemedView";
+import { FavList } from "@/lib/favList";
+import { Product } from "@/types";
+import Animated, { FadeInDown, Layout } from "react-native-reanimated";
+import {
+  Trash2,
+  Heart,
+  ShoppingBag,
+  Check,
+  CheckSquare,
+  Square,
+} from "lucide-react-native";
+import { Swipeable } from "react-native-gesture-handler";
+import { useRouter } from "expo-router";
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function FavoriteProductsScreen() {
+  const [favorites, setFavorites] = useState<Product[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const router = useRouter();
 
-export default function TabTwoScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={<Ionicons size={310} name="code-slash" style={styles.headerImage} />}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText> library
-          to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
+  useEffect(() => {
+    loadFavorites();
+  }, []);
+
+  const loadFavorites = async () => {
+    const favProducts = await FavList.get();
+    setFavorites(favProducts);
+  };
+
+  const handleDelete = async (product: Product) => {
+    Alert.alert(
+      "Remove from Favorites",
+      `Are you sure you want to remove ${product.artName} from your favorites?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Remove",
+          style: "destructive",
+          onPress: async () => {
+            await FavList.remove(product);
+            loadFavorites();
+          },
+        },
+      ]
+    );
+  };
+
+  const handleLongPress = (productId: string) => {
+    setIsSelectionMode(true);
+    setSelectedProducts([productId]);
+  };
+
+  const handlePress = (productId: string) => {
+    if (isSelectionMode) {
+      setSelectedProducts((prev) =>
+        prev.includes(productId)
+          ? prev.filter((id) => id !== productId)
+          : [...prev, productId]
+      );
+    } else {
+      router.push({
+        pathname: "/product/[id]",
+        params: { id: productId },
+      });
+    }
+  };
+
+  const handleRemoveSelected = async () => {
+    Alert.alert(
+      "Remove Selected",
+      `Are you sure you want to remove ${selectedProducts.length} item(s) from your favorites?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Remove",
+          style: "destructive",
+          onPress: async () => {
+            for (const productId of selectedProducts) {
+              const product = favorites.find((p) => p.id === productId);
+              if (product) {
+                await FavList.remove(product);
+              }
+            }
+            setSelectedProducts([]);
+            setIsSelectionMode(false);
+            loadFavorites();
+          },
+        },
+      ]
+    );
+  };
+
+  const renderRightActions = (product: Product) => {
+    return (
+      <TouchableOpacity
+        className="bg-red-500 w-20 h-full justify-center items-center"
+        onPress={() => handleDelete(product)}
+      >
+        <Trash2 size={24} color="#fff" />
+      </TouchableOpacity>
+    );
+  };
+
+  const handleToggleSelectAll = () => {
+    if (selectedProducts.length === favorites.length) {
+      setSelectedProducts([]);
+    } else {
+      setSelectedProducts(favorites.map((p) => p.id));
+    }
+  };
+
+  useEffect(() => {
+    if (selectedProducts.length > 0) {
+      setIsSelectionMode(true);
+    } else {
+      setIsSelectionMode(false);
+    }
+  }, [selectedProducts]);
+
+  const renderItem = ({ item }: { item: Product }) => (
+    <Swipeable
+      renderRightActions={() => renderRightActions(item)}
+      enabled={!isSelectionMode}
+    >
+      <TouchableOpacity
+        onLongPress={() => handleLongPress(item.id)}
+        onPress={() => handlePress(item.id)}
+        delayLongPress={500}
+      >
+        <Animated.View
+          entering={FadeInDown}
+          layout={Layout.springify()}
+          className={`bg-white dark:bg-gray-800 mb-4 flex-row items-center p-4 rounded-lg shadow-sm ${
+            isSelectionMode && selectedProducts.includes(item.id)
+              ? "bg-blue-50"
+              : ""
+          }`}
+        >
+          <Image
+            source={{ uri: item.image }}
+            className="w-16 h-16 rounded-lg mr-4"
+            resizeMode="cover"
+          />
+          <View className="flex-1">
+            <ThemedText numberOfLines={1} className="text-lg font-bold mb-1">
+              {item.artName}
             </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+            <ThemedText className="text-sm text-gray-600 dark:text-gray-400">
+              ${item.price.toFixed(2)}
+            </ThemedText>
+          </View>
+          {isSelectionMode && selectedProducts.includes(item.id) && (
+            <View className="bg-primary rounded-full p-1">
+              <Check size={20} color="#fff" />
+            </View>
+          )}
+        </Animated.View>
+      </TouchableOpacity>
+    </Swipeable>
+  );
+
+  const EmptyState = () => (
+    <View className="flex-1 justify-center items-center px-4">
+      <View className="bg-gray-100 dark:bg-gray-800 rounded-full p-4 mb-6">
+        <Heart size={48} className="text-primary" />
+      </View>
+      <ThemedText className="text-2xl font-bold mb-2 text-center">
+        Your favorites list is empty
+      </ThemedText>
+      <ThemedText className="text-gray-600 dark:text-gray-400 text-center mb-8">
+        Start adding products you love to your favorites list!
+      </ThemedText>
+      <TouchableOpacity
+        className="bg-primary py-3 px-6 rounded-full flex-row items-center"
+        onPress={() => router.push("/")}
+      >
+        <ShoppingBag size={20} color="#fff" className="mr-2" />
+        <ThemedText className="text-white font-semibold">
+          Browse Products
+        </ThemedText>
+      </TouchableOpacity>
+    </View>
+  );
+
+  return (
+    <SafeAreaView
+      className="flex-1 bg-gray-50 dark:bg-gray-900"
+      style={{
+        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+      }}
+    >
+      <ThemedView className="flex-1 px-4 pt-4">
+        <ThemedText className="text-2xl font-bold">
+          Favorite Products
+        </ThemedText>
+
+        <View className="flex-row justify-between items-center my-4">
+          <View className="flex flex-row items-center gap-2 ">
+            <Pressable
+              onPress={handleToggleSelectAll}
+              className="flex-row items-center px-2 py-1  text-blue-500 rounded"
+            >
+              {selectedProducts.length === favorites.length ? (
+                <CheckSquare size={24} className="text-blue-800 mr-2" />
+              ) : (
+                <Square size={24} className="text-blue-800 mr-2" />
+              )}
+              <ThemedText className="text-blue-800">
+                {selectedProducts.length === favorites.length
+                  ? "Deselect All"
+                  : "Select All"}
+              </ThemedText>
+            </Pressable>
+          </View>
+          {isSelectionMode && selectedProducts.length > 0 && (
+            <Pressable onPress={handleRemoveSelected}>
+              <ThemedText className="px-2 py-1 bg-red-200 text-red-800 rounded">
+                Remove ({selectedProducts.length})
+              </ThemedText>
+            </Pressable>
+          )}
+        </View>
+
+        {favorites.length > 0 ? (
+          <FlatList
+            data={favorites}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          />
+        ) : (
+          <EmptyState />
+        )}
+      </ThemedView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-});

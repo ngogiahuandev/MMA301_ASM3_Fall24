@@ -30,6 +30,8 @@ export default function HomeScreen() {
     [scrollY]
   );
 
+  console.log(products);
+
   useEffect(() => {
     fetchProducts();
     fetchAllBrands();
