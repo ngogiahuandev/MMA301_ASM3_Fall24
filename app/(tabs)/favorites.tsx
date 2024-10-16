@@ -5,6 +5,7 @@ import { useTrigger } from "@/store/useTrigger";
 import { Product } from "@/types";
 import { useRouter } from "expo-router";
 import {
+  Ban,
   Check,
   CheckSquare,
   CircleOff,
@@ -12,7 +13,7 @@ import {
   Square,
   Trash2,
 } from "lucide-react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -33,6 +34,7 @@ export default function FavoriteProductsScreen() {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const router = useRouter();
+  const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
 
   useEffect(() => {
     loadFavorites();
@@ -117,12 +119,30 @@ export default function FavoriteProductsScreen() {
     );
   };
 
-  const handleToggleSelectAll = () => {
-    if (selectedProducts.length === favorites.length) {
-      setSelectedProducts([]);
-    } else {
-      setSelectedProducts(favorites.map((p) => p.id));
-    }
+  const handleSelectAll = () => {
+    setSelectedProducts(favorites.map((p) => p.id));
+    closeAllSwipeable();
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedProducts([]);
+    closeAllSwipeable();
+  };
+
+  const closeOpenSwipeable = (id: string) => {
+    Object.entries(swipeableRefs.current).forEach(([key, ref]) => {
+      if (key !== id && ref) {
+        ref.close();
+      }
+    });
+  };
+
+  const closeAllSwipeable = () => {
+    Object.values(swipeableRefs.current).forEach((ref) => {
+      if (ref) {
+        ref.close();
+      }
+    });
   };
 
   useEffect(() => {
@@ -135,7 +155,9 @@ export default function FavoriteProductsScreen() {
 
   const renderItem = ({ item }: { item: Product }) => (
     <Swipeable
+      ref={(ref) => (swipeableRefs.current[item.id] = ref)}
       renderRightActions={() => renderRightActions(item)}
+      onSwipeableWillOpen={() => closeOpenSwipeable(item.id)}
       enabled={!isSelectionMode}
       containerStyle={{ marginBottom: 10 }}
     >
@@ -168,7 +190,7 @@ export default function FavoriteProductsScreen() {
           </View>
           {isSelectionMode && selectedProducts.includes(item.id) && (
             <View className="bg-primary rounded-full p-1">
-              <Check size={20} color="#fff" />
+              <Check size={20} color="blue" />
             </View>
           )}
         </Animated.View>
@@ -204,32 +226,39 @@ export default function FavoriteProductsScreen() {
       }}
     >
       <ThemedView className="flex-1 px-4 pt-4">
-        <ThemedText className="text-2xl font-bold">
+        <ThemedText className="text-2xl font-bold mb-4">
           Favorite Products
         </ThemedText>
 
-        {favorites.length > 0 && (
+        {favorites.length > 1 && (
           <View className="flex-row justify-between items-center my-4">
             <View className="flex flex-row items-center gap-2 ">
               <Pressable
-                onPress={handleToggleSelectAll}
-                className="flex-row items-center px-2 py-1  text-blue-500 rounded"
+                onPress={handleSelectAll}
+                className="flex-row items-center px-2 py-1  text-blue-500 rounded bg-blue-200"
               >
                 {selectedProducts.length === favorites.length ? (
                   <CheckSquare size={24} className="text-blue-800 mr-2" />
                 ) : (
                   <Square size={24} className="text-blue-800 mr-2" />
                 )}
-                <ThemedText className="text-blue-800">
-                  {selectedProducts.length === favorites.length
-                    ? "Deselect All"
-                    : "Select All"}
-                </ThemedText>
+                <ThemedText className="text-blue-800">Select all</ThemedText>
               </Pressable>
+              {selectedProducts.length > 0 && (
+                <Pressable
+                  onPress={handleDeselectAll}
+                  className="flex-row items-center px-2 py-1  text-orange-500 rounded bg-orange-200"
+                >
+                  <Ban size={24} className="text-orange-500 mr-2" />
+                  <ThemedText className="text-orange-500">
+                    Unselect all
+                  </ThemedText>
+                </Pressable>
+              )}
             </View>
             {isSelectionMode && selectedProducts.length > 0 && (
               <Pressable onPress={handleRemoveSelected}>
-                <ThemedText className="px-2 py-1 bg-red-200 text-red-800 rounded">
+                <ThemedText className="px-2 py-1 bg-red-200 text-red-500 rounded">
                   Remove ({selectedProducts.length})
                 </ThemedText>
               </Pressable>

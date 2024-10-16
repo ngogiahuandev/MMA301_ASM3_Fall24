@@ -5,7 +5,11 @@ import { ThemedText } from "@/components/ThemedText";
 import { SearchBar } from "@/components/SearchBar";
 import { BrandFilter } from "@/components/BrandFilter";
 
-export function Header() {
+interface HeaderProps {
+  productsCount: number;
+}
+
+export function Header({ productsCount }: HeaderProps) {
   return (
     <ThemedView className="p-4 mt-[220px] bg-white rounded-lg">
       <View className="flex-row itemas-center mb-6 ">
@@ -18,6 +22,13 @@ export function Header() {
       </ThemedText>
       <SearchBar />
       <BrandFilter />
+      <View className="px-2">
+        {productsCount > 0 && (
+          <ThemedText className="text-sm text-gray-500">
+            {productsCount} product found(s)
+          </ThemedText>
+        )}
+      </View>
     </ThemedView>
   );
 }

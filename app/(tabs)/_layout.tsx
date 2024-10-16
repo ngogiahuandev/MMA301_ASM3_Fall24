@@ -1,7 +1,5 @@
 import { Tabs } from "expo-router";
 import React from "react";
-
-import { TabBarIcon } from "@/components/navigation/TabBarIcon";
 import { HeartIcon, HomeIcon } from "lucide-react-native";
 
 export default function TabLayout() {
@@ -25,6 +23,7 @@ export default function TabLayout() {
           ),
           headerShown: false,
           tabBarShowLabel: false,
+          unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
@@ -39,6 +38,7 @@ export default function TabLayout() {
             />
           ),
           tabBarShowLabel: false,
+          unmountOnBlur: true,
         }}
       />
     </Tabs>

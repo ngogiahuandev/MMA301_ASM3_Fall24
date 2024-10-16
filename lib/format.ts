@@ -52,7 +52,6 @@ export const handlGroupRatingByComments = (
 };
 
 export const getAverageRating = (product: Product) => {
-  //make this as a float number like 4.0
   const totalRating = product.comments.reduce((acc, comment) => {
     return acc + comment.rating;
   }, 0);

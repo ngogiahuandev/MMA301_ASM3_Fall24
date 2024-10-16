@@ -68,7 +68,7 @@ export default function HomeScreen() {
           }
           numColumns={2}
           showsVerticalScrollIndicator={false}
-          ListHeaderComponent={<Header />}
+          ListHeaderComponent={<Header productsCount={products.length} />}
           ListEmptyComponent={
             isLoading ? (
               <ThemedText className="text-center mt-4">

@@ -17,6 +17,7 @@ interface ArtShopActions {
   fetchProducts: (query?: string, brand?: string) => Promise<void>;
   setIsLoading: (isLoading: boolean) => void;
   fetchAllBrands: () => Promise<void>;
+  clearAllFilters: () => void;
 }
 
 type ArtShopStore = ArtShopState & ArtShopActions;
@@ -34,6 +35,11 @@ export const useArtShopStore = create<ArtShopStore>((set, get) => ({
   setSelectedBrand: (brand: string) => set({ selectedBrand: brand }),
 
   setIsLoading: (isLoading: boolean) => set({ isLoading }),
+
+  clearAllFilters: () => {
+    set({ searchQuery: "", selectedBrand: "" });
+    get().fetchProducts();
+  },
 
   fetchProducts: async (query: string = "", brand: string = "") => {
     set({ isLoading: true });
@@ -98,3 +104,5 @@ export const useSetIsLoading = () =>
   useArtShopStore((state) => state.setIsLoading);
 export const useFetchAllBrands = () =>
   useArtShopStore((state) => state.fetchAllBrands);
+export const useClearAllFilters = () =>
+  useArtShopStore((state) => state.clearAllFilters);

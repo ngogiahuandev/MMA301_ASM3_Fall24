@@ -1,6 +1,6 @@
 import { ThemedText } from "@/components/ThemedText";
 import { FavList } from "@/lib/favList";
-import { getAverageRating } from "@/lib/format";
+import { formatDiscount, getAverageRating } from "@/lib/format";
 import { useTrigger } from "@/store/useTrigger";
 import { Product } from "@/types";
 import { useRouter } from "expo-router";
@@ -74,7 +74,7 @@ export function ProductCard({ product }: ProductCardProps) {
               {product.limitedTimeDeal > 0 && (
                 <View className="bg-red-500 rounded px-2 py-1">
                   <ThemedText className="text-white text-xs font-bold">
-                    {product.limitedTimeDeal}% OFF
+                    {formatDiscount(product.limitedTimeDeal)}
                   </ThemedText>
                 </View>
               )}

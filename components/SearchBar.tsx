@@ -1,43 +1,56 @@
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { View, TextInput, Pressable } from "react-native";
-import { Search } from "lucide-react-native";
+import debounce from "lodash.debounce";
 import {
   useSearchQuery,
   useSetSearchQuery,
   useFetchProducts,
   useSelectedBrand,
+  useSetSelectedBrand,
+  useClearAllFilters,
 } from "@/store/useArtShopStore";
+import { ThemedText } from "@/components/ThemedText";
+import { Ban } from "lucide-react-native";
 
 export function SearchBar() {
   const searchQuery = useSearchQuery();
   const setSearchQuery = useSetSearchQuery();
   const fetchProducts = useFetchProducts();
   const selectedBrand = useSelectedBrand();
+  const clearAllFilters = useClearAllFilters();
 
-  const handleSearch = () => {
-    fetchProducts(searchQuery, selectedBrand);
-  };
+  const debouncedFetchProducts = useMemo(
+    () =>
+      debounce((query: string) => {
+        fetchProducts(query, selectedBrand);
+      }, 500),
+    [fetchProducts, selectedBrand]
+  );
+
+  const handleSearchChange = useCallback(
+    (text: string) => {
+      setSearchQuery(text);
+      debouncedFetchProducts(text);
+    },
+    [setSearchQuery, debouncedFetchProducts]
+  );
 
   return (
-    <View className="flex-row items-center mb-4">
+    <View className="mb-4 flex flex-row items-center gap-2">
       <TextInput
-        className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-l-lg px-4 py-2 text-black dark:text-white"
+        className="bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-2 text-black dark:text-white flex-1"
         placeholder="Search artworks..."
         value={searchQuery}
-        onChangeText={setSearchQuery}
+        onChangeText={handleSearchChange}
       />
-      <Pressable
-        className="bg-blue-500 rounded-r-lg px-4 py-2"
-        onPress={handleSearch}
-      >
-        {({ pressed }) => (
-          <Search
-            color="white"
-            size={24}
-            style={{ opacity: pressed ? 0.75 : 1 }}
-          />
-        )}
-      </Pressable>
+      {(searchQuery.length > 0 || selectedBrand !== "") && (
+        <Pressable
+          onPress={clearAllFilters}
+          className="flex-row items-center px-2 py-1  text-red-500 rounded   "
+        >
+          <ThemedText className="text-red-500">Clear</ThemedText>
+        </Pressable>
+      )}
     </View>
   );
 }
